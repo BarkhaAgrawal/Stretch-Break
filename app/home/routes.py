@@ -66,20 +66,20 @@ def upload_image():
     #     flash('Allowed image types are -> png, jpg, jpeg, gif')
     #     return redirect(request.url)        
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--tolerance', type=int, default=30, help='The tolerance for the model in integers')
-parser.add_argument('--model', type=int, default=101, help='The model to use, available versions are 101 (def.), 102, 103 etc')
-parser.add_argument('--cam_id', type=int, default=0, help='The respective cam id to use (default 0)')
-parser.add_argument('--cam_width', type=int, default=1280, help='The width of the webcam in pixels (def. 1280)')
-parser.add_argument('--cam_height', type=int, default=720, help='The height of the webcam in pixels (def. 780)')
-parser.add_argument('--scale_factor', type=float, default=0.4, help='The scale factor to use (default: .7125)')
-parser.add_argument('--file', type=str, default=None, help="Use the video file at specified path instead of live cam")
-args = parser.parse_args()
+# parser = argparse.ArgumentParser()
+# parser.add_argument('--tolerance', type=int, default=30, help='The tolerance for the model in integers')
+# parser.add_argument('--model', type=int, default=101, help='The model to use, available versions are 101 (def.), 102, 103 etc')
+# parser.add_argument('--cam_id', type=int, default=0, help='The respective cam id to use (default 0)')
+# parser.add_argument('--cam_width', type=int, default=1280, help='The width of the webcam in pixels (def. 1280)')
+# parser.add_argument('--cam_height', type=int, default=720, help='The height of the webcam in pixels (def. 780)')
+# parser.add_argument('--scale_factor', type=float, default=0.4, help='The scale factor to use (default: .7125)')
+# parser.add_argument('--file', type=str, default=None, help="Use the video file at specified path instead of live cam")
+# args = parser.parse_args()
 
 keyValues = ['Nose', 'Left eye', 'Right eye', 'Left ear', 'Right ear', 'Left shoulder',
              'Right shoulder', 'Left elbow', 'Right elbow', 'Left wrist', 'Right wrist',
              'Left hip', 'Right hip', 'Left knee', 'Right knee', 'Left ankle', 'Right ankle']
-tolerance = args.tolerance
+tolerance = 30
 tf.compat.v1.disable_v2_behavior()
 
 def countRepetition(previous_pose, current_pose, previous_state, flag):
@@ -121,13 +121,13 @@ def countRepetition(previous_pose, current_pose, previous_state, flag):
 #     cap = cv2.VideoCapture(args.file)
 # else:
 cap = cv2.VideoCapture(0)
-cap.set(3, args.cam_width)
-cap.set(4, args.cam_height)
+cap.set(3, 1280)
+cap.set(4, 720)
 
 
 def getFrame():
     with tf.compat.v1.Session() as sess:
-        model_cfg, model_outputs = posenet.load_model(args.model, sess)
+        model_cfg, model_outputs = posenet.load_model(101, sess)
         output_stride = model_cfg['output_stride']
         previous_pose = '' # '' denotes it is empty, really fast checking!
         count = 0 # Stores the count of repetitions
@@ -140,7 +140,7 @@ def getFrame():
         while True:
             # Get a frame, and get the model's prediction
             input_image, display_image, output_scale = posenet.read_cap(
-                cap, scale_factor=args.scale_factor, output_stride=output_stride)
+                cap, scale_factor=0.4, output_stride=output_stride)
             heatmaps_result, offsets_result, displacement_fwd_result, displacement_bwd_result = sess.run(
                 model_outputs,
                 feed_dict={'image:0': input_image}
@@ -210,7 +210,7 @@ def gen_frame1(cap1):  # generate frame by frame from camera
 def video_feed():
     return Response(getFrame(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@home.route('/video_feed1/<filename>')
+@home.route('/video_feed1/')
 def video_feed1():
     dirname = os.path.dirname(__file__)
     filename1 = os.path.join(dirname, '../static/abc.mp4')
