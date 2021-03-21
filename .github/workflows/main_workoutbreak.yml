@@ -32,4 +32,4 @@ jobs:
       with:
         app-name: 'workoutbreak'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_0d76efce80324fbe99db84ec74270624 }}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_3b0f0c5d7f3449c78fa4646b33ee88ec }}
